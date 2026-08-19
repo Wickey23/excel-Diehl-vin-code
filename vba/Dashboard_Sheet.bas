@@ -12,6 +12,9 @@ Private Sub Worksheet_Activate()
     'Refresh the self-healing core dashboard.
     RefreshDashboardFast
 
+    'Move the visible Model dashboard to N:P under Post Delivery.
+    MoveModelDashboardHere
+
     'Restore the user-addable dashboard area.
     SetupDynamicColumnArea
     RefreshCustomDashboardSections
@@ -29,6 +32,7 @@ Private Sub Worksheet_Change(ByVal Target As Range)
         Application.EnableEvents = False
 
         RefreshDashboardFast
+        MoveModelDashboardHere
         RefreshCustomDashboardSections
 
         On Error Resume Next
@@ -67,11 +71,11 @@ Private Sub Worksheet_SelectionChange(ByVal Target As Range)
     'Customer J:L.
     If HandleHiddenActionClick(Target, 10, 12, "BB", 8) Then GoTo SafeExit
 
-    'Post Delivery N:P.
-    If HandleHiddenActionClick(Target, 14, 16, "BC", 8) Then GoTo SafeExit
+    'Moved Model N:P, starting under Post Delivery.
+    If HandleMovedModelClick(Target) Then GoTo SafeExit
 
-    'Model R:T.
-    If HandleHiddenActionClick(Target, 18, 20, "BD", 8) Then GoTo SafeExit
+    'Post Delivery N:P at the top of the same block.
+    If HandleHiddenActionClick(Target, 14, 16, "BC", 8) Then GoTo SafeExit
 
     'Any user-added Vehicle Master column in V:X.
     If HandleCustomDashboardClick(Target) Then GoTo SafeExit
