@@ -27,6 +27,7 @@ End Sub
 Private Sub Worksheet_Change(ByVal Target As Range)
     Dim entryText As String
     Dim removeName As String
+    Dim closePos As Long
 
     On Error GoTo SafeExit
 
@@ -47,18 +48,28 @@ Private Sub Worksheet_Change(ByVal Target As Range)
 
     'Dashboard column command entered in W6.
     'Examples:
-    '   Model          -> adds Model
-    '   ---Model       -> removes Model
+    '   Model           -> adds Model
+    '   Remove (Model)  -> removes Model
     If Not Intersect(Target, Me.Range(DYN_INPUT_CELL)) Is Nothing Then
         Application.EnableEvents = False
 
         entryText = Trim$(CStr(Me.Range(DYN_INPUT_CELL).Value))
 
-        If Left$(entryText, 3) = "---" Then
-            removeName = Trim$(Mid$(entryText, 4))
+        If UCase$(Left$(entryText, 8)) = "REMOVE (" Then
+            closePos = InStrRev(entryText, ")")
+
+            If closePos > 8 Then
+                removeName = Trim$(Mid$(entryText, 9, closePos - 9))
+            Else
+                removeName = ""
+            End If
 
             If removeName <> "" Then
                 RemoveDashboardColumn removeName
+            Else
+                MsgBox "Use this format:" & vbCrLf & vbCrLf & _
+                       "Remove (Column Name)", _
+                       vbInformation, "VIN Manager"
             End If
 
             Me.Range(DYN_INPUT_CELL).ClearContents
