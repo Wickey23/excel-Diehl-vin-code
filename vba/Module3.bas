@@ -1,8 +1,8 @@
-Attribute VB_Name = "Module3"
 Option Explicit
 
 ' Diehl VIN Manager - main module
-' Initial repository source. Dashboard logic will be maintained here.
+' Paste this file directly into the Module3 code window in the VBA editor.
+' Do NOT add an Attribute VB_Name line when pasting manually.
 
 Public Const MASTER_SHEET As String = "Vehicle Master"
 Public Const DASHBOARD_SHEET As String = "Dashboard"
@@ -33,7 +33,9 @@ Public Sub ShowAllRecords()
 End Sub
 
 Public Function FindHeaderColumn(ByVal ws As Worksheet, ByVal headerText As String) As Long
-    Dim lastCol As Long, c As Long
+    Dim lastCol As Long
+    Dim c As Long
+
     lastCol = ws.Cells(HEADER_ROW, ws.Columns.Count).End(xlToLeft).Column
 
     For c = 1 To lastCol
@@ -46,7 +48,12 @@ End Function
 
 Public Function LastMasterRow() As Long
     Dim ws As Worksheet
+
     Set ws = ThisWorkbook.Worksheets(MASTER_SHEET)
+
     LastMasterRow = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row
-    If LastMasterRow < FIRST_DATA_ROW Then LastMasterRow = FIRST_DATA_ROW
+
+    If LastMasterRow < FIRST_DATA_ROW Then
+        LastMasterRow = FIRST_DATA_ROW
+    End If
 End Function
