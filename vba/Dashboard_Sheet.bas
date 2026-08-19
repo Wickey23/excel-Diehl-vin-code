@@ -25,6 +25,9 @@ SafeExit:
 End Sub
 
 Private Sub Worksheet_Change(ByVal Target As Range)
+    Dim entryText As String
+    Dim removeName As String
+
     On Error GoTo SafeExit
 
     'SHOW RECORDS selector changed.
@@ -42,10 +45,28 @@ Private Sub Worksheet_Change(ByVal Target As Range)
         GoTo SafeExit
     End If
 
-    'User typed a new Vehicle Master header into the dashboard.
+    'Dashboard column command entered in W6.
+    'Examples:
+    '   Model          -> adds Model
+    '   ---Model       -> removes Model
     If Not Intersect(Target, Me.Range(DYN_INPUT_CELL)) Is Nothing Then
         Application.EnableEvents = False
-        AddDashboardColumnFromInput
+
+        entryText = Trim$(CStr(Me.Range(DYN_INPUT_CELL).Value))
+
+        If Left$(entryText, 3) = "---" Then
+            removeName = Trim$(Mid$(entryText, 4))
+
+            If removeName <> "" Then
+                RemoveDashboardColumn removeName
+            End If
+
+            Me.Range(DYN_INPUT_CELL).ClearContents
+            RefreshCustomDashboardSections
+        Else
+            AddDashboardColumnFromInput
+        End If
+
         GoTo SafeExit
     End If
 
