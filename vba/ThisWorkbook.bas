@@ -9,8 +9,14 @@ Private Sub Workbook_Open()
     Application.Calculation = xlCalculationAutomatic
     Application.StatusBar = False
 
+    'Do not rebuild the dashboard automatically on open.
+    'This keeps workbook startup fast and avoids unexpected layout changes.
+    ResetExcelState
+
 SafeExit:
     Application.ScreenUpdating = True
     Application.EnableEvents = True
     Application.DisplayAlerts = True
+    Application.Calculation = xlCalculationAutomatic
+    Application.StatusBar = False
 End Sub
