@@ -1,60 +1,96 @@
 # Diehl VIN Excel VBA
 
-This repository is the source of truth for the VBA used by the Diehl VIN workbook.
+This repository is the source of truth for the Diehl VIN workbook VBA.
 
-## Files
+## Current architecture
 
-- `vba/Module3.bas` — main VIN manager logic, dashboard refresh/filter logic, movable dashboard anchors, quick lookup, and self-repair.
-- `vba/Dashboard_Sheet.bas` — code-behind for the `Dashboard` worksheet.
-- `vba/Quick_Lookup_Sheet.bas` — code-behind for the `QUICK LOOKUP` worksheet.
-- `vba/ThisWorkbook.bas` — workbook open/startup events.
+The current code is the restored **self-healing dashboard** version. It does not use the later named-anchor/movable-table experiment.
 
-## Installing the VBA into Excel
+If a controlled Dashboard section is deleted or damaged, `RefreshDashboardFast` calls `EnsureDashboardStructure`, detects the missing section, and rebuilds the Dashboard automatically.
+
+The Dashboard includes:
+
+- Quick Filters
+- Open / Closed / All selector
+- Program of Concession
+- Year
+- Brand
+- Body Vendor
+- Order / Delivery Stage
+- Customer
+- Post Delivery
+- Model
+- dynamic counts and new values
+- blank / missing-value rows
+- click-to-filter behavior
+- Quick Lookup sheet
+- self-repair / rebuild
+
+The left-side Program, Year, Brand, and Body Vendor sections are rebuilt as a dynamic vertical stack so one list growing does not overwrite the next section.
+
+## VBA files
+
+- `vba/Module3.bas` — complete main VIN manager, filtering, self-healing Dashboard, dynamic sections, and Quick Lookup logic.
+- `vba/Dashboard_Sheet.bas` — Dashboard worksheet events and click handlers.
+- `vba/Quick_Lookup_Sheet.bas` — Quick Lookup worksheet events.
+- `vba/ThisWorkbook.bas` — workbook startup/reset behavior.
+
+## Install into Excel
 
 1. Open the `.xlsm` workbook.
-2. Press `Alt + F11` to open the VBA editor.
-3. Put the contents of `vba/Module3.bas` into the standard VBA module named `Module3`.
-4. Put the contents of `vba/Dashboard_Sheet.bas` into the code window for the `Dashboard` worksheet.
-5. Put the contents of `vba/Quick_Lookup_Sheet.bas` into the code window for the `QUICK LOOKUP` worksheet.
-6. Put the contents of `vba/ThisWorkbook.bas` into `ThisWorkbook`.
-7. In the VBA editor choose `Debug > Compile VBAProject`.
-8. Save the workbook as a macro-enabled `.xlsm` file.
+2. Press `Alt + F11`.
+3. Open `Modules > Module3`, delete its old contents, and paste the entire current `vba/Module3.bas` file.
+4. Open the code window for the `Dashboard` worksheet and replace it with `vba/Dashboard_Sheet.bas`.
+5. Open the code window for the `QUICK LOOKUP` worksheet and replace it with `vba/Quick_Lookup_Sheet.bas`.
+6. Open `ThisWorkbook` and replace it with `vba/ThisWorkbook.bas`.
+7. Choose `Debug > Compile VBAProject`.
+8. Do not continue until the project compiles without an error.
 
-## What to run after installing the code
+## First run after installing
 
-If all four code files have just been installed, run this first from the VBA editor or Macro dialog:
+Run these macros in this order:
 
-`ResetExcelState`
+1. `ResetExcelState`
+2. `RebuildDashboardLayout`
+3. `SetupQuickLookupSheet`
+4. `RefreshVINSystem`
 
-This makes sure Excel events, screen updating, calculation, and alerts are in a normal state.
+After the initial setup, normal Dashboard use should not require manually running those macros.
+
+## Self-healing behavior
+
+When the Dashboard worksheet activates, it runs `RefreshDashboardFast`.
+
+`RefreshDashboardFast` checks the required Dashboard sections. If a section title or controlled layout has been deleted, it runs `RebuildDashboardLayout` and recreates the Dashboard before refreshing the counts and dynamic tables.
+
+To manually force a repair at any time, run:
+
+`RebuildDashboardLayout`
 
 Then run:
 
-`ShowAllRecords`
+`RefreshVINSystem`
 
-This clears the current Vehicle Master filters and returns the master sheet to the All Records view.
+## Dashboard layout
 
-At the current repository revision, these are the two main procedures that are ready to run. The repository is being used to rebuild the full dashboard system incrementally, so do not assume procedures from older chat versions exist unless they are present in the current `vba/Module3.bas` file.
+- Quick Filters: `B:E`
+- Status / Order Delivery Stage: `G:J`
+- Customer: `L:O`
+- Post Delivery: `Q:T`
+- Model: `V:Y`
+- Left dynamic stack begins at row 20 in `B:E`
 
-## Normal workflow
-
-1. Make/edit VBA changes in this repository.
-2. Copy/import the updated file into the matching Excel VBA project location.
-3. Run `Debug > Compile VBAProject`.
-4. Run `ResetExcelState` if Excel gets stuck with events or screen updating disabled.
-5. Test the changed feature in a copy of the workbook before using it on the live file.
-
-## Current workbook assumptions
+## Workbook assumptions
 
 - Master sheet: `Vehicle Master`
 - Dashboard sheet: `Dashboard`
-- Quick lookup sheet: `QUICK LOOKUP`
-- Header row: `2`
-- First data row: `3`
-- Open / Closed / All selector target in the planned full dashboard: `Dashboard!C5`
+- Quick Lookup sheet: `QUICK LOOKUP`
+- Vehicle Master header row: `2`
+- Vehicle Master first data row: `3`
+- Open / Closed / All selector: `Dashboard!C5`
+
+The code looks up Vehicle Master fields by header text rather than relying on fixed Vehicle Master column letters, so rearranging Vehicle Master columns should not break the filters as long as the header names remain unchanged.
 
 ## Important
 
-The current GitHub code is the source of truth. Older VBA pasted in chat may contain functions that are not yet present in the repository. Before running a macro name from an older message, check that it exists in the current repository version.
-
-The full planned dashboard includes dynamic sections for Order / Delivery Stage, Customer, Model, Year, Brand, Body Vendor, Post Delivery, Program of Concession, Open / Closed / All filtering, highlighting, click-to-filter behavior, and Quick Lookup. Those features should be added and tested in GitHub before being copied into the live workbook.
+Use the GitHub files as the master copy. Make changes in GitHub first, then copy the updated VBA into Excel and compile before testing the live workbook.
