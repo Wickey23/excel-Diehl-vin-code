@@ -4,7 +4,7 @@ This repository is the source of truth for the Diehl VIN workbook VBA.
 
 ## Current architecture
 
-The current code is the restored **self-healing dashboard** version. It does not use the later named-anchor/movable-table experiment.
+The current code is the restored **self-healing dashboard** version.
 
 If a controlled Dashboard section is deleted or damaged, `RefreshDashboardFast` calls `EnsureDashboardStructure`, detects the missing section, and rebuilds the Dashboard automatically.
 
@@ -20,7 +20,7 @@ The Dashboard includes:
 - Customer
 - Post Delivery
 - Model
-- dynamic counts and new values
+- dynamic counts and newly added values
 - blank / missing-value rows
 - click-to-filter behavior
 - Quick Lookup sheet
@@ -28,9 +28,22 @@ The Dashboard includes:
 
 The left-side Program, Year, Brand, and Body Vendor sections are rebuilt as a dynamic vertical stack so one list growing does not overwrite the next section.
 
+## Cleaner dashboard layout
+
+Visible `FILTER ACTION` columns have been removed from the Dashboard. The click actions are stored in hidden helper columns `AZ:BD`, so clicking a dashboard row still filters Vehicle Master without displaying technical filter strings.
+
+Visible tables are compact 3-column blocks with a spacer column between them:
+
+- Quick Filters: `B:D`
+- Status / Order Delivery Stage: `F:H`
+- Customer: `J:L`
+- Post Delivery: `N:P`
+- Model: `R:T`
+- Program / Year / Brand / Body Vendor dynamic stack: `B:D`, beginning at row 20
+
 ## VBA files
 
-- `vba/Module3.bas` — complete main VIN manager, filtering, self-healing Dashboard, dynamic sections, and Quick Lookup logic.
+- `vba/Module3.bas` — complete main VIN manager, filtering, self-healing Dashboard, dynamic sections, hidden click actions, and Quick Lookup logic.
 - `vba/Dashboard_Sheet.bas` — Dashboard worksheet events and click handlers.
 - `vba/Quick_Lookup_Sheet.bas` — Quick Lookup worksheet events.
 - `vba/ThisWorkbook.bas` — workbook startup/reset behavior.
@@ -70,15 +83,6 @@ To manually force a repair at any time, run:
 Then run:
 
 `RefreshVINSystem`
-
-## Dashboard layout
-
-- Quick Filters: `B:E`
-- Status / Order Delivery Stage: `G:J`
-- Customer: `L:O`
-- Post Delivery: `Q:T`
-- Model: `V:Y`
-- Left dynamic stack begins at row 20 in `B:E`
 
 ## Workbook assumptions
 
